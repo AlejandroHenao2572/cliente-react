@@ -1,16 +1,76 @@
-# React + Vite
+# Cliente react
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+```js
+const WS_URL = "http://localhost:8080/ws";
 
-Currently, two official plugins are available:
+function App() {
+  const [turn, setTurn] = useState(null);
+  const [ticketCalled, setTicketCalled] = useState(null);
+  const [stompClient, setStompClient] = useState(null);
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+  useEffect(() => {
+    // Conectar a WebSocket STOMP
+    const socket = new SockJS(WS_URL);
+    const client = over(socket);
 
-## React Compiler
+    client.connect({}, () => {
+      client.subscribe("/topic/ticket-called", (msg) => {
+        const data = JSON.parse(msg.body);
+        setTicketCalled(data);
+      });
+    });
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+    setStompClient(client);
 
-## Expanding the ESLint configuration
+    // Cleanup al desmontar
+    return () => {
+      if (client && client.connected) client.disconnect();
+    };
+  }, []);
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+  const getTicket = async () => {
+    const res = await fetch("http://localhost:8080/api/turn/ticket");
+    if (res.ok) {
+      const json = await res.json();
+      setTurn(json);
+    }
+  };
+
+  const checkTicket = async () => {
+    const res = await fetch("http://localhost:8080/api/turn/check/ticket");
+    if (res.ok) {
+      const json = await res.json();
+      setTurn(json);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Cliente de Turnos</h2>
+      <button onClick={getTicket}>Solicitar Turno</button>
+      <button onClick={checkTicket} style={{ marginLeft: 10 }}>
+        Verificar Turno
+      </button>
+      <div style={{ marginTop: 20 }}>
+        <strong>Turno:</strong>
+        <div>
+          {turn `ID: ${turn.id}, Estado: ${turn.status}`}
+        </div>
+      </div>
+      <div style={{ marginTop: 20 }}>
+        <strong>Ultimo turno llamado en tiempo real:</strong>
+        <div>
+          {turn `ID: ${turn.id}, Estado: ${turn.status}`}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+```
+Este cliente en react:
+- Hace peticiones al API de turnos
+- Muestra el turno generado
+- Permite marcar un turno
+- Muestra el tiempo real el ultimo turno llamado

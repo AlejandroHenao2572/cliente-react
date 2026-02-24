@@ -46,26 +46,22 @@ function App() {
   };
 
   return (
-    <div style={{ fontFamily: "sans-serif", padding: 20 }}>
+    <div>
       <h2>Cliente de Turnos</h2>
       <button onClick={getTicket}>Solicitar Turno</button>
       <button onClick={checkTicket} style={{ marginLeft: 10 }}>
         Verificar Turno
       </button>
       <div style={{ marginTop: 20 }}>
-        <strong>Mi último resultado:</strong>
+        <strong>Turno:</strong>
         <div>
-          {turn
-            ? `ID: ${turn.id}, Estado: ${turn.status}`
-            : "Ningún dato recibido aún."}
+          {turn `ID: ${turn.id}, Estado: ${turn.status}`}
         </div>
       </div>
       <div style={{ marginTop: 20 }}>
-        <strong>Último turno llamado (en tiempo real):</strong>
+        <strong>Ultimo turno llamado en tiempo real:</strong>
         <div>
-          {ticketCalled
-            ? `ID: ${ticketCalled.id}, Estado: ${ticketCalled.status}`
-            : "Ningún evento recibido aún."}
+          {turn `ID: ${turn.id}, Estado: ${turn.status}`}
         </div>
       </div>
     </div>
